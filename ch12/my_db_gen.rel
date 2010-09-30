@@ -1,0 +1,4 @@
+{release, {"Key Value DB","R0A"}, {erts, "5.8"},
+ [{kernel,"2.14"},
+  {stdlib,"1.17"},
+  {my_db_gen,"0.1"}]}.

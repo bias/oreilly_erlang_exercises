@@ -1,0 +1,24 @@
+-module(add_two).
+-export([start/0, request/1, stop/0, loop/0]).
+
+start() ->
+	register(add_two, spawn(?MODULE, loop, [])),
+	{ok, whereis(add_two)}.
+
+request(Term) ->
+	call({request, self(), Term}),
+	receive {reply, X} -> X end.
+
+call(Msg) ->
+	add_two ! Msg.
+
+stop() ->
+	echo ! stop.
+
+loop() ->
+	receive
+		{request, Pid, Term} -> 
+			Pid ! {reply, Term+2},
+			loop();
+		stop -> ok
+	end.

@@ -1,0 +1,1 @@
+-record(pair, {key, value}).
