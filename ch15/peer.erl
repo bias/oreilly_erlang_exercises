@@ -7,7 +7,7 @@ start() ->
 
 client(Host, Data) ->
     {ok, Socket} = gen_tcp:connect(Host, 1234, [binary, {packet, 0}]),
-    tcp:send(Socket, Data),
+    gen_tcp:send(Socket, Data),
     ok = gen_tcp:close(Socket).
 
 wait_connect(ListenSocket, Count) ->
