@@ -13,13 +13,15 @@ send(Socket, Rest) ->
     gen_tcp:send(Socket, Rest).
 
 server() ->
-    {ok, ListenSocket} = gen_tcp:listen(1234, [binary, {active, false}]),
-    wait_connect(ListenSocket,0).
+	{ok, ListenSocket} = gen_tcp:listen(1234, [binary, {active, false}]),
 
+wait_connect(ListenSocket,0).
 wait_connect(ListenSocket, Count) ->
-    {ok, Socket} = gen_tcp:accept(ListenSocket),
-    spawn(?MODULE, wait_connect, [ListenSocket, Count+1]),
-    get_request(Socket, [], Count).
+	{ok, Socket} = gen_tcp:accept(ListenSocket),
+	Pid = spawn(?MODULE, get_request, [Socket, [], Count]),
+	gen_tcp:controlling_process(Socket, Pid),
+wait_connect(ListenSocket, Count+1).
+
 
 get_request(Socket, BinaryList, Count) ->
     case gen_tcp:recv(Socket, 0, 5000) of
@@ -29,7 +31,9 @@ get_request(Socket, BinaryList, Count) ->
 	    handle(lists:reverse(BinaryList), Count)
     end.
 
+
 handle(Binary, Count) ->
     {ok, Fd} = file:open("log_file_"++integer_to_list(Count), write),
     file:write(Fd, Binary),
     file:close(Fd).
+
